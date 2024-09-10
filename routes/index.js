@@ -1,8 +1,8 @@
-import { Router } from "express";
-const router = Router();
+import express from "express";
+import { handleResponse } from "../controller/demo-controller.js";
 
-router.get("/", (req, res) => {
-  res.send("Hello World from ES Modules with Nodemon!");
-});
+const router = express.Router();
+
+router.route("/demo").get(handleResponse);
 
 export default router;
