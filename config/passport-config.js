@@ -1,3 +1,5 @@
+import dotenv from 'dotenv'
+dotenv.config();
 import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
 import FacebookStrategy from "passport-facebook";
@@ -16,8 +18,7 @@ import {
 passport.use(
   new GoogleStrategy(
     {
-      clientID:
-        "7444739130-0qtkbmpfaov9c12bf8t907cig0idsjin.apps.googleusercontent.com",
+      clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "/auth/google/callback",
     },
