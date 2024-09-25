@@ -3,6 +3,10 @@ import bcrypt from "bcryptjs";
 import { request, response } from "express";
 
 import Users from "../models/user-model.js";
+import {
+  sendErrorResponse,
+  sendSuccessResponse,
+} from "../utils/send-status-.js";
 
 import {
   generateAccessToken,
@@ -15,7 +19,8 @@ export const registerUser = async (req = request, res = response) => {
   try {
     const existingUser = await Users.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return sendErrorResponse(res, "User Already Exists", 400);
+      // return res.status(400).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -31,9 +36,16 @@ export const registerUser = async (req = request, res = response) => {
     });
 
     await newUser.save();
-    return res.status(201).json({ message: "User registered successfully" });
+    return sendSuccessResponse(
+      res,
+      newUser,
+      "User registered successfully",
+      201
+    );
+    // return res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
-    return res.status(500).json({ message: "Server error", err });
+    // return res.status(500).json({ message: "Server error", err });
+    return sendErrorResponse(res, "Internal Server Error", 500);
   }
 };
 
@@ -42,16 +54,35 @@ export const loginUser = (req, res) => {
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
 
-  return res.json({
-    message: "Login successful",
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-    },
-    accessToken,
-    refreshToken,
-  });
+  try {
+    return sendSuccessResponse(
+      res,
+      {
+        user: {
+          name: user?.name,
+          email: user?.email,
+          username: user?.username,
+        },
+        accessToken,
+        refreshToken,
+      },
+      "Login successful",
+      200
+    );
+  } catch (err) {
+    console.log("ERROR", err)
+  }
+
+  // return res.json({
+  //   message: "Login successful",
+  //   user: {
+  //     id: user._id,
+  //     name: user.name,
+  //     email: user.email,
+  //   },
+  //   accessToken,
+  //   refreshToken,
+  // });
 };
 
 export const tokenIsRequired = (req, res) => {
