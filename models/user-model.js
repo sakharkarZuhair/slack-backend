@@ -9,7 +9,7 @@ const userRoleSchema = new mongoose.Schema({
   workspace: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "WorkSpace",
-    required: true,
+    // required: true,
   },
 });
 
@@ -30,6 +30,14 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+userSchema.statics.findByEmail = async function (email) {
+  try {
+    return await this.findOne({ email });
+  } catch (error) {
+    throw new Error("Error finding user by email");
+  }
+};
 
 // Adding indexes
 userSchema.index({ email: 1, is_deleted: 1 });
