@@ -20,7 +20,6 @@ export const registerUser = async (req = request, res = response) => {
     const existingUser = await Users.findOne({ email });
     if (existingUser) {
       return sendErrorResponse(res, "User Already Exists", 400);
-      // return res.status(400).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -42,9 +41,7 @@ export const registerUser = async (req = request, res = response) => {
       "User registered successfully",
       201
     );
-    // return res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
-    // return res.status(500).json({ message: "Server error", err });
     return sendErrorResponse(res, "Internal Server Error", 500);
   }
 };
@@ -70,19 +67,8 @@ export const loginUser = (req, res) => {
       200
     );
   } catch (err) {
-    console.log("ERROR", err)
+    console.log("ERROR", err);
   }
-
-  // return res.json({
-  //   message: "Login successful",
-  //   user: {
-  //     id: user._id,
-  //     name: user.name,
-  //     email: user.email,
-  //   },
-  //   accessToken,
-  //   refreshToken,
-  // });
 };
 
 export const tokenIsRequired = (req, res) => {
@@ -116,6 +102,20 @@ export const generateNewTokenUsingRefreshToken = async (req, res) => {
   } catch (error) {
     console.log("ERROR", error);
     return res.sendStatus(403);
+  }
+};
+
+export const getUsers = async (req, res) => {
+  try {
+    const users = await Users.find({});
+    return sendSuccessResponse(
+      res,
+      { users: users },
+      "Users Fetched successfully",
+      200
+    );
+  } catch (error) {
+    return sendErrorResponse(res, "Internal Server Error", 500);
   }
 };
 

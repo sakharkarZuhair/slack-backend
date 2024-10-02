@@ -24,16 +24,9 @@ router.get(
     }
 
     const { accessToken, refreshToken, user } = req.user;
-    return res.json({
-      message: "Login Successful",
-      user: {
-        id: user?._id,
-        name: user?.name,
-        email: user?.email,
-      },
-      accessToken,
-      refreshToken,
-    });
+    return res.redirect(
+      `http://localhost:3000/authentication?accessToken=${accessToken}&refreshToken=${refreshToken}`
+    );
   }
 );
 
