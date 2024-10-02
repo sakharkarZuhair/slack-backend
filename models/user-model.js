@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, index: true },
     username: { type: String, required: true, unique: true, index: true },
-    password: { type: String, required: true }, // Only for custom authentication
+    password: { type: String }, // Only for custom authentication
     auth_provider: {
       type: String,
       enum: ["google", "github", "facebook", "custom"],
@@ -27,6 +27,8 @@ const userSchema = new mongoose.Schema(
     },
     role: [userRoleSchema],
     is_deleted: { type: Boolean, default: false, index: true },
+    accessToken: { type: String, required: false },
+    refreshToken: { type: String, required: false },
   },
   { timestamps: true }
 );

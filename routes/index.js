@@ -1,5 +1,5 @@
 import express from "express";
-// import GoogleAuthRoutes from "./auth-routes.js";
+import GoogleAuthRoutes from "./auth-routes.js";
 import {
   loginUser,
   registerUser,
@@ -11,7 +11,7 @@ import { authenticateToken } from "../middlewares/authenticate-token.js";
 
 const router = express.Router();
 
-// router.use(GoogleAuthRoutes);
+router.use(GoogleAuthRoutes);
 router.route("/register").post(registerUser);
 router.post(
   "/login",

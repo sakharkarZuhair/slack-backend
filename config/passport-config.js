@@ -1,4 +1,4 @@
-import dotenv from 'dotenv'
+import dotenv from "dotenv";
 dotenv.config();
 import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
@@ -20,12 +20,18 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/auth/google/callback",
+      callbackURL: "http://localhost:4000/api/v1/auth/google/callback",
     },
-    async (profile, done) => {
+    async (accessTokenFromGoogle, refreshTokenFromGoogle, profile, done) => {
       try {
-        const email = profile.emails[0]?.value;
-        console.log("Google Auth User", profile);
+        const email =
+          profile.emails && profile.emails.length > 0
+            ? profile.emails[0].value
+            : null;
+
+        if (!email) {
+          return done(new Error("No email found"), false);
+        }
 
         const existingUser = await Users.findByEmail(email);
 
@@ -41,6 +47,8 @@ passport.use(
           username: email.split("@")[0],
           auth_provider: "google",
           role: [{ role: "User", workspace: null }],
+          accessToken: accessTokenFromGoogle,
+          refreshToken: refreshTokenFromGoogle,
         });
 
         await newUser.save();
@@ -49,6 +57,7 @@ passport.use(
         const refreshToken = generateRefreshToken(newUser);
         return done(null, { user: newUser, accessToken, refreshToken });
       } catch (error) {
+        console.log("ERROR", error);
         return done(error, false);
       }
     }
@@ -73,7 +82,7 @@ passport.use(
         if (!user) {
           return done(null, false, { message: "Invalid email or username" });
         }
-        
+
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
           return done(null, false, { message: "Invalid email or password" });
