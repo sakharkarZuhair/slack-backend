@@ -23,6 +23,7 @@ export const authenticateToken = async (req, res, next) => {
     // console.log("Access token expired or invalid", error);
     // If the access token has expired, try to refresh it using the refresh token
     if (error.name === "TokenExpiredError" && refreshToken) {
+      // console.log("ERRRR")
       try {
         // Verify the refresh token
         const decoded = jwt.verify(
@@ -42,9 +43,11 @@ export const authenticateToken = async (req, res, next) => {
         // console.log("Generated new access token:", newAccessToken);
 
         // Send new tokens back to the client
+        // console.log("TOken Expired")
         return res.json({
           accessToken: newAccessToken,
           refreshToken: refreshToken, // Optionally send the refresh token
+          message: 'access-token-expired'
         });
       } catch (refreshError) {
         console.log("Error verifying refresh token", refreshError);

@@ -79,29 +79,39 @@ export const tokenIsRequired = (req, res) => {
 
 export const generateNewTokenUsingRefreshToken = async (req, res) => {
   const { refreshToken } = req.body;
+  // console.log("WORKING")
 
+  // Check if refresh token is provided
   if (!refreshToken) {
     return res.sendStatus(401); // Unauthorized
   }
 
   try {
+    // Verify the refresh token
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
+    // Find the user associated with the refresh token
     const user = await Users.findById(decoded.id);
     if (!user) {
-      return res.sendStatus(403);
+      return res.sendStatus(403); // Forbidden if user not found
     }
 
+    // Generate new access and refresh tokens
     const newAccessToken = generateAccessToken(user);
     const newRefreshToken = generateRefreshToken(user);
 
+    // Optionally, update the user's refresh token in the database if required
+    // user.refreshToken = newRefreshToken; // Uncomment if you want to store the new refresh token in DB
+    // await user.save();
+
+    // Send the new tokens back to the client
     return res.json({
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
     });
   } catch (error) {
-    console.log("ERROR", error);
-    return res.sendStatus(403);
+    console.error("ERROR in generating new token:", error);
+    return res.sendStatus(403); // Forbidden if verification fails
   }
 };
 
